@@ -3,17 +3,17 @@
 token=$1
 resource=$2
 
+urlarr=()
 url=https://api.ciscospark.com/v1/${resource}
 
-#curl -v $url/$resource -H "Authorization: Bearer ${token}" | jq .items
-
-#while (( ${+url} )); do
 while [[ -n "$url" ]]; do
-
-#curl -I does a HEAD http request, so we should't put too much burden on the server
+urlarr+=${url}
 url=$(curl -s -I ${url} -H "Authorization: Bearer ${token}" | awk '/Link: </ { print $2}' | sed -e s/\<//g -e s/\>\;//g)
- 
 done
 
+for val in ${urlarr[@]}; do 
+  #now we are equipped to retireve all the values
+  curl -s -H "Authorization: Bearer ${token}" ${val} | jq . 
+done
 
 
